@@ -39,7 +39,7 @@ workflow CALL_SNV {
         ch_genome_vcf_tabix    = Channel.empty()
 
 
-    if (params.analysis_type == "wes") {
+    if (params.analysis_type == "wes" || params.analysis_type == "wgs") {
         BAM_VARIANT_CALLING_HAPLOTYPECALLER(
             ch_genome_bam_bai,
             ch_genome_fasta,
@@ -104,7 +104,7 @@ workflow CALL_SNV {
 
     }
 
-    if (params.analysis_type.equals("wgs") || params.run_mt_for_wes) {
+    if (params.analysis_type == "wgs" || params.run_mt_for_wes) {
         CALL_SNV_MT(
             ch_mt_bam_bai,
             ch_genome_fasta,
