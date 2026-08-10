@@ -1,2 +1,0 @@
-sample,lane,fastq_1,fastq_2,sex,phenotype,paternal_id,maternal_id,case_id
-S103,1,/home/user2/Downloads/MGIDATA_S103_R1_001.fq.gz,/home/user2/Downloads/MGIDATA_S103_R2_001.fq.gz,1,2,0,0,S103

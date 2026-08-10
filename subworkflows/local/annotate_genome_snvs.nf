@@ -59,6 +59,14 @@ workflow ANNOTATE_GENOME_SNVS {
             .map { meta, vcf, tbi -> return [meta, vcf, tbi, []]}
             .set { ch_vcf_in }
 
+        BCFTOOLS_VIEW(ch_vcf_in, [], [], [])  // filter on frequencies 
+
+        TABIX_BCFTOOLS_VIEW (BCFTOOLS_VIEW.out.vcf)   
+
+        BCFTOOLS_VIEW.out.vcf
+            .join(TABIX_BCFTOOLS_VIEW.out.tbi, failOnMismatch:true, failOnDuplicate:true)
+            .set { ch_vcf_scatter_in }
+
         /*VCFANNO (ch_vcf_in, ch_vcfanno_toml, ch_vcfanno_lua, ch_vcfanno_resources)
 
         VCFANNO.out.vcf
@@ -131,7 +139,7 @@ workflow ANNOTATE_GENOME_SNVS {
 
         // Annotating with ensembl Vep
         ENSEMBLVEP_SNV(
-            ch_vcf_in,
+            ch_vcf_scatter_in,
             val_vep_genome,
             "homo_sapiens",
             val_vep_cache_version,
@@ -178,8 +186,8 @@ workflow ANNOTATE_GENOME_SNVS {
         //ch_versions = ch_versions.mix(CHROMOGRAPH_SITES.out.versions)
         //ch_versions = ch_versions.mix(CHROMOGRAPH_REGIONS.out.versions)
         //ch_versions = ch_versions.mix(ZIP_TABIX_VCFANNO.out.versions)
-        //ch_versions = ch_versions.mix(BCFTOOLS_VIEW.out.versions)
-        //ch_versions = ch_versions.mix(TABIX_BCFTOOLS_VIEW.out.versions)
+        ch_versions = ch_versions.mix(BCFTOOLS_VIEW.out.versions)
+        ch_versions = ch_versions.mix(TABIX_BCFTOOLS_VIEW.out.versions)
         //ch_versions = ch_versions.mix(GATK4_SELECTVARIANTS.out.versions.first())
         ch_versions = ch_versions.mix(ENSEMBLVEP_SNV.out.versions.first())
         ch_versions = ch_versions.mix(TABIX_VEP.out.versions.first())

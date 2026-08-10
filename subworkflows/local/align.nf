@@ -39,10 +39,16 @@ workflow ALIGN {
         ch_versions           = Channel.empty()
 
         if (!params.skip_fastp) {
-            FASTP (ch_reads_input, [], false, false)
-            ch_reads_input = FASTP.out.reads
-            ch_versions = ch_versions.mix(FASTP.out.versions)
-            ch_fastp_json = FASTP.out.json
+            FASTP (ch_reads_input.map {meta, reads -> return [meta, reads, []] },[], false, false, false)
+            ch_reads_input   = FASTP.out.reads
+            ch_fastp_json    = FASTP.out.json
+            ch_fastp_publish = FASTP.out.json
+                .mix(FASTP.out.html)
+                .mix(FASTP.out.log)
+                .mix(FASTP.out.reads)
+                .mix(FASTP.out.reads_fail)
+                .mix(FASTP.out.reads_merged)
+                .map { meta, value -> ['trimming/', [meta, value]] }
         }
 
         if (params.aligner.matches("bwamem2|bwa|bwameme")) {

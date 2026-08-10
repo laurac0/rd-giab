@@ -8,7 +8,7 @@ process VCFANNO {
         'biocontainers/vcfanno:0.3.5--h9ee0642_0' }"
 
     input:
-    tuple val(meta), path(vcf), path(tbi), path(specific_resources)
+    tuple val(meta), path(vcf), path(tbi)
     path toml
     path lua
     path resources

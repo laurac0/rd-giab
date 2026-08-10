@@ -8,7 +8,8 @@ process BCFTOOLS_CONCAT {
         'biocontainers/bcftools:1.18--h8b25389_0' }"
 
     input:
-    tuple val(meta), path(vcfs), path(tbi)
+    tuple val(meta), path(vcf1)
+    tuple val(meta), path(vcf2)
 
     output:
     tuple val(meta), path("*.gz"), emit: vcf
@@ -25,7 +26,7 @@ process BCFTOOLS_CONCAT {
         --output ${prefix}.vcf.gz \\
         $args \\
         --threads $task.cpus \\
-        ${vcfs}
+        ${vcf1} ${vcf2}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

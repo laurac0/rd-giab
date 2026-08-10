@@ -111,6 +111,7 @@ include { ANNOTATE_GENOME_SNVS                               } from '../subworkf
 include { ANNOTATE_CSQ_PLI as ANN_CSQ_PLI_SNV                } from '../subworkflows/local/annotate_consequence_pli'
 include { GENERATE_CLINICAL_SET as GENERATE_CLINICAL_SET_SNV } from '../subworkflows/local/generate_clinical_set'
 include { RANK_VARIANTS as RANK_VARIANTS_SNV                 } from '../subworkflows/local/rank_variants'
+include { BCFTOOLS_CONCAT                                    } from '../modules/nf-core/bcftools/concat/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -483,11 +484,13 @@ workflow RAREDISEASE {
 
     }
 
-    snv_vcf = ANNOTATE_GENOME_SNVS.out.vcf_ann
-    mt_vcf = ANNOTATE_MT_SNVS.out.vcf_ann
+    snv_vcf = CALL_SNV.out.genome_vcf
+    mt_vcf = CALL_SNV.out.mt_vcf
 
-    CSVTK_CONCAT (snv_vcf,mt_vcf)
-    TABIX_TABIX_SNV_MITO (CSVTK_CONCAT.out.tab)
+
+
+    BCFTOOLS_CONCAT (snv_vcf,mt_vcf)
+    TABIX_TABIX_SNV_MITO (BCFTOOLS_CONCAT.out.vcf)
 
     //
     // MODULE: Pipeline reporting
